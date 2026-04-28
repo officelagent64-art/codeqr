@@ -1,0 +1,13 @@
+{
+  "name": "certificate-verify",
+  "version": "1.0.0",
+  "description": "Site de vérification des certificats - Université Ain Témouchent",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}
