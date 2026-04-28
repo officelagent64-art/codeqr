@@ -10,16 +10,16 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY
 );
 
-// ─── Page de vérification ───────────────────────────────────────────────────
+// ─── Verification page ───────────────────────────────────────────────────────
 app.get('/verify', async (req, res) => {
   const { id } = req.query;
 
   if (!id) {
-    return res.status(400).send(renderPage('error', null, 'معرف الشهادة مفقود'));
+    return res.status(400).send(renderPage('error', null, 'Certificate ID is missing'));
   }
 
   try {
-    // Chercher le certificat dans demandes_certificats + jointure student
+    // Search for the certificate in demandes_certificats + student join
     const { data: cert, error } = await supabase
       .from('demandes_certificats')
       .select(`
@@ -49,19 +49,19 @@ app.get('/verify', async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    return res.status(500).send(renderPage('error', null, 'خطأ في الخادم'));
+    return res.status(500).send(renderPage('error', null, 'Server error'));
   }
 });
 
-// ─── Page d'accueil ─────────────────────────────────────────────────────────
+// ─── Home page ───────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
+    <html lang="en" dir="ltr">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>جامعة عين تموشنت - التحقق من الشهادات</title>
+      <title>University of Ain Témouchent - Certificate Verification</title>
       ${styles()}
     </head>
     <body>
@@ -69,9 +69,9 @@ app.get('/', (req, res) => {
         ${header()}
         <div class="card" style="text-align:center; padding: 50px 30px;">
           <div style="font-size: 60px; margin-bottom: 20px;">🎓</div>
-          <h2 style="color: #1a3a5c; margin-bottom: 15px;">منصة التحقق من الشهادات</h2>
+          <h2 style="color: #1a3a5c; margin-bottom: 15px;">Certificate Verification Platform</h2>
           <p style="color: #666; font-size: 16px;">
-            امسح رمز QR الموجود على الشهادة للتحقق من صحتها
+            Scan the QR code on the certificate to verify its authenticity
           </p>
         </div>
         ${footer()}
@@ -88,11 +88,11 @@ function renderPage(status, cert, meta) {
   if (status === 'valid') {
     return `
       <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
+      <html lang="en" dir="ltr">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>✅ شهادة معتمدة - جامعة عين تموشنت</title>
+        <title>✅ Verified Certificate - University of Ain Témouchent</title>
         ${styles()}
       </head>
       <body>
@@ -102,60 +102,60 @@ function renderPage(status, cert, meta) {
           <div class="status-badge valid-badge">
             <span class="status-icon">✅</span>
             <div>
-              <div class="status-title">شهادة معتمدة وموثقة</div>
-              <div class="status-sub">تم التحقق من صحة هذه الشهادة بنجاح</div>
+              <div class="status-title">Certified and Authenticated Certificate</div>
+              <div class="status-sub">This certificate has been successfully verified</div>
             </div>
           </div>
 
           <div class="card">
-            <div class="section-title">📋 معلومات الطالب</div>
+            <div class="section-title">📋 Student Information</div>
             <div class="info-grid">
               <div class="info-item">
-                <div class="info-label">الاسم الكامل (بالعربية)</div>
+                <div class="info-label">Full Name (Arabic)</div>
                 <div class="info-value">${s.first_name_ar || ''} ${s.last_name_ar || ''}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">الاسم الكامل (بالفرنسية)</div>
+                <div class="info-label">Full Name (French)</div>
                 <div class="info-value" style="direction:ltr">${s.first_name || ''} ${s.last_name || ''}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">تاريخ الميلاد</div>
+                <div class="info-label">Date of Birth</div>
                 <div class="info-value">${s.birth_date || ''} — ${s.birth_place_ar || ''}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">رقم التسجيل</div>
+                <div class="info-label">Registration Number</div>
                 <div class="info-value highlight">${s.student_id || ''}</div>
               </div>
             </div>
           </div>
 
           <div class="card">
-            <div class="section-title">🎓 المعلومات الأكاديمية</div>
+            <div class="section-title">🎓 Academic Information</div>
             <div class="info-grid">
               <div class="info-item">
-                <div class="info-label">السنة الدراسية</div>
+                <div class="info-label">Academic Year Level</div>
                 <div class="info-value">${s.levele || cert.levele || 'L3'}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">الميدان</div>
+                <div class="info-label">Field</div>
                 <div class="info-value" style="direction:ltr">${s.field || 'Mathématiques et Informatique'}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">التخصص</div>
+                <div class="info-label">Specialty</div>
                 <div class="info-value" style="direction:ltr">${s.specialty || 'Système Informatique'}</div>
               </div>
               <div class="info-item">
-                <div class="info-label">السنة الجامعية</div>
+                <div class="info-label">University Year</div>
                 <div class="info-value highlight">${s.year || '2025-2026'}</div>
               </div>
             </div>
           </div>
 
           <div class="card cert-id-card">
-            <div class="section-title">🔐 معرف الشهادة</div>
+            <div class="section-title">🔐 Certificate ID</div>
             <div class="cert-id">${meta}</div>
             <div style="color:#888; font-size:13px; margin-top:8px;">
-              تاريخ الإصدار: ${cert.date_validation ? new Date(cert.date_validation).toLocaleDateString('ar-DZ') : new Date(cert.created_at).toLocaleDateString('ar-DZ')}
+              Issue Date: ${cert.date_validation ? new Date(cert.date_validation).toLocaleDateString('en-GB') : new Date(cert.created_at).toLocaleDateString('en-GB')}
             </div>
           </div>
 
@@ -169,11 +169,11 @@ function renderPage(status, cert, meta) {
   if (status === 'invalid') {
     return `
       <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
+      <html lang="en" dir="ltr">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>❌ شهادة غير صالحة</title>
+        <title>❌ Invalid Certificate</title>
         ${styles()}
       </head>
       <body>
@@ -182,13 +182,13 @@ function renderPage(status, cert, meta) {
           <div class="status-badge invalid-badge">
             <span class="status-icon">❌</span>
             <div>
-              <div class="status-title">شهادة غير معتمدة</div>
-              <div class="status-sub">هذه الشهادة غير موجودة في قاعدة البيانات أو تم إلغاؤها</div>
+              <div class="status-title">Certificate Not Recognized</div>
+              <div class="status-sub">This certificate does not exist in the database or has been revoked</div>
             </div>
           </div>
           <div class="card" style="text-align:center; color:#666;">
-            <p style="font-size:15px;">المعرف المُدخل: <strong style="color:#c0392b;">${meta}</strong></p>
-            <p style="font-size:14px;">إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع إدارة الجامعة.</p>
+            <p style="font-size:15px;">Entered ID: <strong style="color:#c0392b;">${meta}</strong></p>
+            <p style="font-size:14px;">If you believe this is an error, please contact the university administration.</p>
           </div>
           ${footer()}
         </div>
@@ -200,10 +200,10 @@ function renderPage(status, cert, meta) {
   // error
   return `
     <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
+    <html lang="en" dir="ltr">
     <head>
       <meta charset="UTF-8">
-      <title>خطأ</title>
+      <title>Error</title>
       ${styles()}
     </head>
     <body>
@@ -212,7 +212,7 @@ function renderPage(status, cert, meta) {
         <div class="status-badge invalid-badge">
           <span class="status-icon">⚠️</span>
           <div>
-            <div class="status-title">حدث خطأ</div>
+            <div class="status-title">An Error Occurred</div>
             <div class="status-sub">${meta}</div>
           </div>
         </div>
@@ -228,7 +228,7 @@ function header() {
     <div class="header">
       <div class="header-logo">🏛️</div>
       <div>
-        <div class="header-title">جامعة عين تموشنت</div>
+        <div class="header-title">University of Ain Témouchent</div>
         <div class="header-sub">Université d'Ain Témouchent</div>
       </div>
     </div>
@@ -238,9 +238,9 @@ function header() {
 function footer() {
   return `
     <div class="footer">
-      <div>طريق سيدي بلعباس ص.ب 284/46000 عين تموشنت</div>
+      <div>Route de Sidi Bel Abbès P.O. Box 284/46000 Ain Témouchent</div>
       <div style="margin-top:5px; color: #1a3a5c; font-weight:600;">
-        منصة التحقق الرسمية من الشهادات الجامعية
+        Official University Certificate Verification Platform
       </div>
     </div>
   `;
